@@ -57,6 +57,30 @@ Each agent is stateless and task-specific — it receives structured data from t
 - **Offense rankings** use expert preseason projections (The Ringer) for weeks 1–3, then switch to cumulative season averages for weeks 4–18.
 - **AI reasoning** is handled by Claude (claude-sonnet-4-5) via the Anthropic API.
 
+### The Agents
+
+**AI Draft Assistant**
+Receives the full player pool ranked by weighted 3-year PPR averages, your current roster, and the picks already made around the league. Recommends the best available player for your team's needs at each pick and explains the reasoning — why this player over the next best alternative, what hole it fills on your roster, and what to watch out for.
+
+**AI Weekly Lineup Agent**
+Each week, receives your full roster with each player's blended PPR average (preseason history + current season stats), their upcoming opponent, and a 🟢/🟡/🔴 defensive matchup grade based on how many fantasy points that defense has allowed to the player's position this season. Sets the optimal starting lineup and writes a plain-English summary explaining close calls and any players worth keeping an eye on.
+
+**AI Waiver Wire Agent**
+Scans all available free agents, compares them to your current roster by position, and surfaces the best upgrades ranked by projected output. Tells you who to drop to make room and why the swap is worth making.
+
+**AI Trade Analyzer Agent**
+Evaluates multi-player trade packages from both sides — factoring in positional scarcity, roster construction, and remaining schedule — then writes a persuasive pitch tailored to what the other manager needs. The goal isn't just to assess fairness; it's to help you close the deal.
+
+**AI Defensive Streaming Agent**
+Recommends which free-agent defense to pick up and start each week. Unlike skill-position players who you hold all season, defenses are best streamed weekly against the softest available opponent. The agent scores every available defense using a blended formula:
+
+**Score = 75% matchup quality + 25% DEF unit quality**
+
+- **Matchup quality**: how weak the upcoming opponent's offense is (rank 1 = weakest = best matchup)
+- **DEF unit quality**: how many fantasy points the defense itself scores per game on average this season
+
+**Weeks 1–3**: opponent offense strength is sourced from expert preseason rankings (The Ringer) rather than small-sample game data. Switches to cumulative season averages from week 4 onward.
+
 ---
 
 ## Setup
@@ -151,19 +175,6 @@ All player value calculations use **PPR scoring**:
 | Passing yard | 0.04 |
 | Passing TD | 4.0 |
 | Interception | −2.0 |
-
----
-
-## AI Defensive Streaming Agent — Methodology
-
-The agent scores every available free-agent defense each week using a blended formula:
-
-**Score = 75% matchup quality + 25% DEF unit quality**
-
-- **Matchup quality**: how weak the upcoming opponent's offense is (rank 1 = weakest = best matchup)
-- **DEF unit quality**: how many fantasy points the defense itself scores per game on average this season
-
-**Weeks 1–3**: opponent offense strength is sourced from expert preseason rankings (The Ringer) rather than small-sample game data. Switches to cumulative season averages from week 4 onward.
 
 ---
 
