@@ -1,33 +1,54 @@
 # AI Fantasy Football Assistant
 
-An AI-powered fantasy football manager built with Python, Streamlit, and Claude (Anthropic). Connect your Sleeper fantasy league and get data-driven recommendations for drafting, weekly lineup decisions, waiver wire pickups, trade analysis, and defensive streaming — all explained in plain English by an AI agent.
+A multi-agent AI fantasy football manager built with Python, Streamlit, and Claude (Anthropic). Connect your Sleeper fantasy league and deploy a team of specialized AI agents that handle every aspect of your season — from draft day through the championship — each powered by real NFL data and explained in plain English.
 
 ---
 
-## What It Does
+## The Agent Team
 
-| Feature | Description |
+| Agent | Role |
 |---|---|
-| **AI Draft Assistant** | Ranks players using 3 years of weighted PPR stats, blended with in-season performance. Claude explains each pick. |
-| **Weekly Lineup Optimizer** | Sets your optimal starting lineup each week with matchup-aware start/sit advice. |
-| **Waiver Wire Recommendations** | Surfaces the best available upgrades at each position based on projected output. |
-| **Trade Analyzer** | Evaluates multi-player trade packages considering team needs and player value. Claude pitches the trade to your opponent. |
-| **DEF Streaming** | Each week, recommends the best available free-agent defense based on opponent offense strength (75%) and DEF unit quality (25%). |
-| **Defensive Matchup Grades** | Every player in your lineup shows a 🟢/🟡/🔴 matchup grade based on how many fantasy points their upcoming opponent's defense has allowed this season. |
+| **AI Draft Assistant** | Ranks players using 3 years of weighted PPR stats, blended with in-season performance. Explains every pick in the context of your team's needs. |
+| **AI Weekly Lineup Agent** | Sets your optimal starting lineup each week with matchup-aware start/sit reasoning. Flags tough and favorable defensive matchups for every player. |
+| **AI Waiver Wire Agent** | Surfaces the best available free-agent upgrades at each position and tells you who to drop to make room. |
+| **AI Trade Analyzer Agent** | Evaluates multi-player trade packages considering positional value and team needs, then writes a persuasive pitch you can send straight to your opponent. |
+| **AI Defensive Streaming Agent** | Each week, identifies the best available free-agent defense using a blended score: 75% opponent offense weakness + 25% DEF unit quality. |
+
+Each agent is stateless and task-specific — it receives structured data from the pipeline, reasons over it with Claude, and returns a plain-English recommendation. No agent shares memory with another; all shared intelligence lives in the data layer.
 
 ---
 
 ## How It Works
 
 ```
-Sleeper API  ──►  data_pipeline/  ──►  app.py (Streamlit UI)
-                  (stats, rosters,           │
-                   schedules,                │
-                   defense rankings)    Claude API
-                                            │
-                                       agents/
-                                       (draft, lineup,
-                                        trade, strategy)
+                        ┌─────────────────────────────────┐
+                        │         Sleeper API              │
+                        │    (rosters, stats, leagues)     │
+                        └────────────────┬────────────────┘
+                                         │
+                        ┌────────────────▼────────────────┐
+                        │         data_pipeline/           │
+                        │  • Multi-year PPR stat history   │
+                        │  • Live in-season stat blending  │
+                        │  • Defense rankings (pts allowed)│
+                        │  • Offense rankings (pts scored) │
+                        │  • Weekly ESPN matchup cache     │
+                        └────────────────┬────────────────┘
+                                         │
+                        ┌────────────────▼────────────────┐
+                        │        app.py (Streamlit UI)     │
+                        │                                  │
+                        │   ┌──────────────────────────┐  │
+                        │   │       agents/            │  │
+                        │   │  ┌─────────────────────┐ │  │
+                        │   │  │  Draft Agent        │ │  │
+                        │   │  │  Lineup Agent       │ │  │
+                        │   │  │  Waiver Wire Agent  │◄────── Claude API
+                        │   │  │  Trade Agent        │ │  │   (Anthropic)
+                        │   │  │  Strategy Agent     │ │  │
+                        │   │  └─────────────────────┘ │  │
+                        │   └──────────────────────────┘  │
+                        └─────────────────────────────────┘
 ```
 
 - **Data** is pulled from the free [Sleeper API](https://docs.sleeper.com/) and [ESPN's public scoreboard API](https://site.api.espn.com). No paid subscriptions required.
@@ -82,7 +103,7 @@ The app opens in your browser at `http://localhost:8501`.
 
 1. **Season Setup tab** → enter your Sleeper username → the app fetches your leagues and downloads player stats for 2022–2024.
 2. **My Leagues tab** → select your league → enter the current NFL week.
-3. Done. You're ready to draft or manage your team.
+3. Done. All agents are ready.
 
 The app caches all data locally in `data/` so subsequent loads are fast.
 
@@ -93,15 +114,15 @@ The app caches all data locally in `data/` so subsequent loads are fast.
 ```
 ├── app.py                          # Main Streamlit application
 ├── agents/
-│   ├── draft_agent.py              # AI draft pick explanations
-│   ├── lineup_agent.py             # AI weekly lineup rationale
-│   ├── trade_agent.py              # AI trade pitch generator
-│   └── strategy_agent.py           # General strategy advice
+│   ├── draft_agent.py              # AI Draft Assistant
+│   ├── lineup_agent.py             # AI Weekly Lineup Agent
+│   ├── trade_agent.py              # AI Trade Analyzer Agent
+│   └── strategy_agent.py           # AI Waiver Wire + Strategy Agent
 ├── data_pipeline/
 │   ├── sleeper_client.py           # Sleeper API wrapper
 │   ├── data_processor.py           # Multi-year stats aggregation
 │   ├── current_season.py           # Live in-season stat fetching
-│   ├── defense_rankings.py         # PPR pts allowed + offense rankings
+│   ├── defense_rankings.py         # PPR pts allowed/scored + DEF streaming logic
 │   ├── depth_chart_scraper.py      # Depth chart data
 │   └── schedule_fetcher.py         # NFL schedule fetching
 ├── data/
@@ -133,24 +154,24 @@ All player value calculations use **PPR scoring**:
 
 ---
 
-## Defense Streaming Logic
+## AI Defensive Streaming Agent — Methodology
 
-The DEF streaming system scores available free-agent defenses each week using a blended formula:
+The agent scores every available free-agent defense each week using a blended formula:
 
 **Score = 75% matchup quality + 25% DEF unit quality**
 
 - **Matchup quality**: how weak the upcoming opponent's offense is (rank 1 = weakest = best matchup)
 - **DEF unit quality**: how many fantasy points the defense itself scores per game on average this season
 
-**Preseason schedule (weeks 1–3)**: opponent offense strength uses expert preseason rankings from The Ringer rather than small-sample game data. Switches to cumulative season averages from week 4 onward.
+**Weeks 1–3**: opponent offense strength is sourced from expert preseason rankings (The Ringer) rather than small-sample game data. Switches to cumulative season averages from week 4 onward.
 
 ---
 
 ## Key Design Decisions
 
+- **Multi-agent architecture** — each agent is single-purpose and stateless. Swapping or upgrading one agent doesn't affect the others.
 - **No paid data sources** — everything uses free public APIs (Sleeper, ESPN scoreboard).
 - **Bayesian blending** — early-season rankings are anchored to the prior year to prevent week-1 flukes from distorting recommendations.
-- **Stateless AI agents** — Claude is called fresh each week with structured context. No memory between calls; all intelligence comes from the data pipeline.
 - **Local-first** — all data is cached on disk. The app works offline once data is fetched.
 
 ---
