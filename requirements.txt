@@ -1,0 +1,26 @@
+# AI Fantasy Football - Python Dependencies
+# Install with: pip install -r requirements.txt
+
+# Web app UI
+streamlit
+
+# HTTP requests (for calling APIs)
+requests
+
+# Data manipulation and analysis
+pandas
+
+# Anthropic Claude API (the AI reasoning layer)
+anthropic
+
+# Environment variable management (for storing your API key safely)
+python-dotenv
+
+# Pretty progress bars when fetching data
+tqdm
+
+# Data storage (lightweight local database)
+# (built into Python — no install needed: import sqlite3)
+
+# Jupyter notebooks (for exploring data interactively)
+jupyter

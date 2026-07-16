@@ -1,0 +1,47 @@
+# ── API keys and secrets ──────────────────────────────────────────────────────
+.env
+
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# ── Virtual environment ───────────────────────────────────────────────────────
+venv/
+.venv/
+env/
+
+# ── Personal league data (contains your Sleeper roster / picks) ───────────────
+data/leagues.json
+
+# ── Raw data (large files, auto-fetched by the app on first run) ──────────────
+data/raw/
+
+# ── Auto-generated processed files (rebuilt by the app each week) ─────────────
+# Keep: preseason reference files and matchup cache (public ESPN data)
+# Keep: depth_chart_corrections.json (manual reference)
+data/processed/players.csv
+data/processed/multi_year_summary.csv
+data/processed/season_*.csv
+data/processed/depth_charts_*.csv
+data/processed/defense_rankings_*.csv
+data/processed/offense_rankings_*.csv
+data/processed/def_quality_rankings_*.csv
+data/processed/bye_weeks_*.json
+data/processed/season_config.json
+
+# ── macOS ─────────────────────────────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ── Jupyter ───────────────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+notebooks/.ipynb_checkpoints/
+
+# ── IDE ───────────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
