@@ -115,6 +115,12 @@ class TradeAgent:
             if wks and cur is not None:
                 line += f", {season_note} avg {cur:.1f} over {int(wks)} games"
             line += f", blended {val:.1f}"
+            sched = p.get("schedule_strength")
+            if sched and sched.get("weeks_with_data", 0) >= 2:
+                avg_rank = sched.get("avg_rank", 0)
+                label    = sched.get("schedule_label", "")
+                n_weeks  = sched.get("weeks_remaining", 0)
+                line += f", {label} remaining schedule (avg def #{avg_rank:.0f}/32, {n_weeks} wks)"
             return line
 
         give_lines = "\n".join(f"  • {fmt_player(p)}" for p in give_players)
@@ -177,6 +183,8 @@ MY TEAM'S SITUATION:
 
 SPECIAL ANGLES:
 {angle_text}
+
+SCHEDULE NOTE: Remaining schedule info is provided as a secondary tiebreaker only. Do NOT let it override a clear difference in player value or production. Only mention it if the players are otherwise close in value and the schedule difference is meaningfully easy or tough.
 
 Write a short 2-3 sentence trade pitch that:
 1. Explains clearly why {my_team_name} benefits from this deal

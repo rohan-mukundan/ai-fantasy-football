@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>6-Team PPR Draft Strategy</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; min-height: 100vh; padding: 24px; }
+
+  .header { text-align: center; margin-bottom: 32px; }
+  .league-badge { display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 6px 16px; border-radius: 20px; margin-bottom: 12px; }
+  h1 { font-size: 32px; font-weight: 800; color: #f8fafc; }
+  .subtitle { color: #94a3b8; margin-top: 6px; font-size: 15px; }
+  .data-tag { display: inline-block; background: #1e293b; border: 1px solid #334155; border-radius: 6px; font-size: 11px; color: #64748b; padding: 3px 8px; margin-top: 8px; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+
+  .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 20px; }
+  .card-sm { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 14px; }
+  .card-title { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #64748b; margin-bottom: 14px; }
+
+  /* Scarcity bars */
+  .scarcity-row { margin-bottom: 12px; }
+  .scarcity-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+  .pos-name { font-weight: 700; font-size: 14px; }
+  .pos-pct { font-size: 13px; font-weight: 600; }
+  .bar-track { background: #0f1117; border-radius: 4px; height: 8px; }
+  .bar-fill { height: 8px; border-radius: 4px; transition: width 0.6s; }
+  .scarcity-note { font-size: 11px; color: #64748b; margin-top: 3px; }
+
+  .green { color: #4ade80; }
+  .yellow { color: #fbbf24; }
+  .orange { color: #fb923c; }
+  .red { color: #f87171; }
+  .purple { color: #c084fc; }
+  .blue { color: #60a5fa; }
+
+  .bg-green { background: #4ade80; }
+  .bg-yellow { background: #fbbf24; }
+  .bg-orange { background: #fb923c; }
+  .bg-red { background: #f87171; }
+
+  /* Round table */
+  .round-table { width: 100%; border-collapse: collapse; }
+  .round-table th { text-align: left; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #64748b; padding: 8px 12px; border-bottom: 1px solid #334155; }
+  .round-table td { padding: 10px 12px; border-bottom: 1px solid #1a2234; font-size: 14px; vertical-align: top; }
+  .round-table tr:last-child td { border-bottom: none; }
+  .round-table tr:hover td { background: #263348; }
+  .round-num { font-weight: 800; color: #6366f1; min-width: 28px; }
+  .pick-range { font-size: 12px; color: #64748b; display: block; }
+  .pos-pill { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px; margin-right: 4px; }
+  .pill-rb { background: #1d4ed8; color: #bfdbfe; }
+  .pill-wr { background: #166534; color: #bbf7d0; }
+  .pill-qb { background: #92400e; color: #fde68a; }
+  .pill-te { background: #9f1239; color: #fecdd3; }
+  .pill-k  { background: #374151; color: #d1d5db; }
+  .pill-def { background: #312e81; color: #c7d2fe; }
+  .strategy-text { color: #cbd5e1; line-height: 1.5; }
+  .priority-label { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; display: inline-block; margin-bottom: 4px; }
+  .p-must { background: #f87171; color: #1a0000; }
+  .p-high { background: #fbbf24; color: #1a0000; }
+  .p-med  { background: #4ade80; color: #001a00; }
+  .p-low  { background: #334155; color: #94a3b8; }
+
+  /* Backup counts */
+  .backup-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .backup-card { background: #0f1117; border-radius: 8px; padding: 12px; text-align: center; }
+  .backup-pos { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: #64748b; text-transform: uppercase; }
+  .backup-num { font-size: 28px; font-weight: 900; margin: 4px 0; }
+  .backup-label { font-size: 11px; color: #64748b; }
+
+  /* Key rules */
+  .rule { display: flex; align-items: flex-start; gap: 10px; padding: 12px 0; border-bottom: 1px solid #1a2234; }
+  .rule:last-child { border-bottom: none; }
+  .rule-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .rule-text { font-size: 14px; color: #cbd5e1; line-height: 1.5; }
+  .rule-text strong { color: #f8fafc; }
+
+  /* Stat pills */
+  .stat-box { text-align: center; }
+  .stat-val { font-size: 26px; font-weight: 900; }
+  .stat-lbl { font-size: 11px; color: #64748b; margin-top: 2px; }
+
+  .section-title { font-size: 17px; font-weight: 700; color: #f8fafc; margin-bottom: 12px; margin-top: 24px; }
+  .mb16 { margin-bottom: 16px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="league-badge">PPR Draft Strategy</div>
+  <h1>6-Team League</h1>
+  <div class="subtitle">Data-backed from PFR 2020–2024 actual PPR finishes</div>
+  <div class="data-tag">Waiver pool: ~910 players · Rostered: 90 of ~1,000</div>
+</div>
+
+<!-- Key stats -->
+<div class="grid-4 mb16">
+  <div class="card-sm stat-box">
+    <div class="stat-val green">HUGE</div>
+    <div class="stat-lbl">Waiver Wire</div>
+  </div>
+  <div class="card-sm stat-box">
+    <div class="stat-val" style="color:#6366f1">BPA</div>
+    <div class="stat-lbl">Core Philosophy</div>
+  </div>
+  <div class="card-sm stat-box">
+    <div class="stat-val yellow">0–1</div>
+    <div class="stat-lbl">RB Backups</div>
+  </div>
+  <div class="card-sm stat-box">
+    <div class="stat-val green">0</div>
+    <div class="stat-lbl">QB/TE/K/DEF Backups</div>
+  </div>
+</div>
+
+<!-- Positional Scarcity -->
+<div class="card mb16">
+  <div class="card-title">Positional Scarcity — 6-Team League</div>
+  <div class="scarcity-row">
+    <div class="scarcity-label"><span class="pos-name green">QB</span><span class="pos-pct green">30% demanded — VERY LOW</span></div>
+    <div class="bar-track"><div class="bar-fill bg-green" style="width:30%"></div></div>
+    <div class="scarcity-note">Only 6 QBs needed. 20 startable QBs in NFL. 14 remain on waivers all year.</div>
+  </div>
+  <div class="scarcity-row">
+    <div class="scarcity-label"><span class="pos-name green">RB</span><span class="pos-pct green">42% demanded — LOW</span></div>
+    <div class="bar-track"><div class="bar-fill bg-green" style="width:42%"></div></div>
+    <div class="scarcity-note">~15 RB starters needed. 36 startable RBs in NFL. 21 available on waivers.</div>
+  </div>
+  <div class="scarcity-row">
+    <div class="scarcity-label"><span class="pos-name green">WR</span><span class="pos-pct green">25% demanded — VERY LOW</span></div>
+    <div class="bar-track"><div class="bar-fill bg-green" style="width:25%"></div></div>
+    <div class="scarcity-note">~15 WR starters needed. 60 startable WRs in NFL. 45 available on waivers.</div>
+  </div>
+  <div class="scarcity-row">
+    <div class="scarcity-label"><span class="pos-name yellow">TE</span><span class="pos-pct yellow">43% demanded — MODERATE</span></div>
+    <div class="bar-track"><div class="bar-fill bg-yellow" style="width:43%"></div></div>
+    <div class="scarcity-note">6 TEs needed. Only 14 fantasy-relevant TEs in NFL. Still 8 on waivers but most are streamers.</div>
+  </div>
+</div>
+
+<!-- Round by round -->
+<div class="card mb16">
+  <div class="card-title">Round-by-Round Draft Guide (15 Rounds)</div>
+  <table class="round-table">
+    <thead>
+      <tr>
+        <th>Round</th>
+        <th>Pick Range</th>
+        <th>Target Positions</th>
+        <th>Strategy</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="round-num">1</td>
+        <td><span class="pick-range">Picks 1–6</span></td>
+        <td><span class="pos-pill pill-rb">RB</span><span class="pos-pill pill-wr">WR</span></td>
+        <td class="strategy-text"><span class="priority-label p-must">BPA</span> Take the best player on the board. In a 6-team league, rounds 1–2 will still have multiple elite options. Don't force a position.</td>
+      </tr>
+      <tr>
+        <td class="round-num">2</td>
+        <td><span class="pick-range">Picks 7–12</span></td>
+        <td><span class="pos-pill pill-rb">RB</span><span class="pos-pill pill-wr">WR</span></td>
+        <td class="strategy-text"><span class="priority-label p-must">BPA</span> Still pure BPA. No urgency — every player drafted in rounds 1–4 in a 12-team league is still on the board here.</td>
+      </tr>
+      <tr>
+        <td class="round-num">3</td>
+        <td><span class="pick-range">Picks 13–18</span></td>
+        <td><span class="pos-pill pill-rb">RB</span><span class="pos-pill pill-wr">WR</span><span class="pos-pill pill-te">TE</span></td>
+        <td class="strategy-text"><span class="priority-label p-high">FLEX/TE</span> If Kelce or an elite TE falls here, take them — PFR data shows top-2 TEs finish top-10 overall every year. Otherwise take best RB/WR.</td>
+      </tr>
+      <tr>
+        <td class="round-num">4–5</td>
+        <td><span class="pick-range">Picks 19–30</span></td>
+        <td><span class="pos-pill pill-rb">RB</span><span class="pos-pill pill-wr">WR</span><span class="pos-pill pill-qb">QB</span></td>
+        <td class="strategy-text"><span class="priority-label p-med">UPSIDE</span> First QB consideration window. Data shows a top-5 QB is available in rounds 5–8 every year (Love'23, Daniels'24, Mayfield'23). Don't overdraft QB — wait.</td>
+      </tr>
+      <tr>
+        <td class="round-num">6–7</td>
+        <td><span class="pick-range">Picks 31–42</span></td>
+        <td><span class="pos-pill pill-qb">QB</span><span class="pos-pill pill-rb">RB</span><span class="pos-pill pill-wr">WR</span></td>
+        <td class="strategy-text"><span class="priority-label p-med">QB LOCK</span> Lock in your QB by round 7. In a 6-team league, 5 excellent QBs still available here. Take the highest-upside one.</td>
+      </tr>
+      <tr>
+        <td class="round-num">8–9</td>
+        <td><span class="pick-range">Picks 43–54</span></td>
+        <td><span class="pos-pill pill-te">TE</span><span class="pos-pill pill-rb">RB</span><span class="pos-pill pill-wr">WR</span></td>
+        <td class="strategy-text"><span class="priority-label p-med">TE/DEPTH</span> Draft your TE if you didn't in R3. TE2 tier (Andrews, Kelce backup) works fine — streaming is viable with huge waivers. Add RB/WR depth.</td>
+      </tr>
+      <tr>
+        <td class="round-num">10–11</td>
+        <td><span class="pick-range">Picks 55–66</span></td>
+        <td><span class="pos-pill pill-rb">RB</span><span class="pos-pill pill-wr">WR</span></td>
+        <td class="strategy-text"><span class="priority-label p-low">UPSIDE</span> Handcuff only your #1 RB if he's injury-prone. Otherwise take high-upside receivers or situation RBs (new starter, high-volume role).</td>
+      </tr>
+      <tr>
+        <td class="round-num">12–13</td>
+        <td><span class="pick-range">Picks 67–78</span></td>
+        <td><span class="pos-pill pill-wr">WR</span><span class="pos-pill pill-rb">RB</span><span class="pos-pill pill-def">DEF</span></td>
+        <td class="strategy-text"><span class="priority-label p-low">LOTTERY</span> Take shots on upside: rookie WRs, second-year breakouts, RBs in training camp battles. PFR data: ~1 waiver RB and ~1 waiver WR finish top-30 every year — these rounds find them.</td>
+      </tr>
+      <tr>
+        <td class="round-num">14</td>
+        <td><span class="pick-range">Picks 79–84</span></td>
+        <td><span class="pos-pill pill-def">DEF</span><span class="pos-pill pill-wr">WR</span></td>
+        <td class="strategy-text"><span class="priority-label p-low">STREAM</span> Draft DEF late — all defenses stream in a 6-team league. Take a favorable Week 1 matchup and roll with waivers after.</td>
+      </tr>
+      <tr>
+        <td class="round-num">15</td>
+        <td><span class="pick-range">Picks 85–90</span></td>
+        <td><span class="pos-pill pill-k">K</span></td>
+        <td class="strategy-text"><span class="priority-label p-low">LAST</span> Always draft your kicker last. In a 6-team league with 910 players on waivers, K variance is meaningless — grab any top-10 kicker here.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Backup counts -->
+<div class="card mb16">
+  <div class="card-title">Backup Counts — Data Rationale</div>
+  <div class="backup-grid">
+    <div class="backup-card">
+      <div class="backup-pos">QB</div>
+      <div class="backup-num green">0</div>
+      <div class="backup-label">No backup needed</div>
+    </div>
+    <div class="backup-card">
+      <div class="backup-pos">RB</div>
+      <div class="backup-num yellow">0–1</div>
+      <div class="backup-label">1 only if elite RB</div>
+    </div>
+    <div class="backup-card">
+      <div class="backup-pos">WR</div>
+      <div class="backup-num green">0</div>
+      <div class="backup-label">Stream freely</div>
+    </div>
+    <div class="backup-card">
+      <div class="backup-pos">TE</div>
+      <div class="backup-num green">0</div>
+      <div class="backup-label">8 TEs on waivers</div>
+    </div>
+    <div class="backup-card">
+      <div class="backup-pos">K</div>
+      <div class="backup-num green">0</div>
+      <div class="backup-label">Always stream</div>
+    </div>
+    <div class="backup-card">
+      <div class="backup-pos">DEF</div>
+      <div class="backup-num green">0</div>
+      <div class="backup-label">Always stream</div>
+    </div>
+  </div>
+  <div style="margin-top:14px;padding:12px;background:#0f1117;border-radius:8px;font-size:13px;color:#94a3b8;line-height:1.6;">
+    <strong style="color:#f8fafc">QB:</strong> 0% injury rate among top-20 QBs (PFR 2020–24). Top-5 QB available rounds 5–8 every year. 14 startable QBs sit on waivers all season. <strong style="color:#f8fafc">RB:</strong> Only handcuff your RB1 if they are a true workhorse (CMC, Henry tier) — the backup inherits a top-5 workload. With 21 RBs on waivers, you can replace an average RB freely. <strong style="color:#f8fafc">WR/TE/K/DEF:</strong> Combined 45 WRs + 8 TEs + 26 Ks + 26 DEFs on waivers. Streaming dominates.
+  </div>
+</div>
+
+<!-- Key rules -->
+<div class="card">
+  <div class="card-title">6-Team Rules — From the Data</div>
+  <div class="rule">
+    <div class="rule-icon">🏆</div>
+    <div class="rule-text"><strong>Pure BPA through round 5.</strong> No positional scarcity exists in a 6-team league. The player who finishes #1 at their position is almost always available — draft the best player, period.</div>
+  </div>
+  <div class="rule">
+    <div class="rule-icon">⚡</div>
+    <div class="rule-text"><strong>Exploit the waiver wire aggressively.</strong> 910 players available. PFR data: ~1.2 undrafted/late RBs finish top-30 every year (Robinson 2020, Pollard 2022, Conner 2021). In a 6-team league, these players are untouched on waivers.</div>
+  </div>
+  <div class="rule">
+    <div class="rule-icon">⚠️</div>
+    <div class="rule-text"><strong>Never reach for QB before round 6.</strong> QBs finishing top-5 at ADP rounds 1–3 are a trap — data shows ~1 QB per year busts at that ADP. With 14 QBs on waivers, you lose nothing by waiting.</div>
+  </div>
+  <div class="rule">
+    <div class="rule-icon">🎯</div>
+    <div class="rule-text"><strong>If Kelce or #1 TE falls to round 3, take him.</strong> Top-2 TEs averaged top-8 overall finishes from 2020–2024. In a 6-team league they may slip past round 2. If available at 3, the value is too good to pass.</div>
+  </div>
+  <div class="rule">
+    <div class="rule-icon">🔄</div>
+    <div class="rule-text"><strong>Stream K and DEF every single week.</strong> 26 kickers and 26 defenses on waivers. Matchup-stream DEF — PFR data shows top-5 DEF units change year to year unpredictably. Rostering a second DEF wastes a bench spot.</div>
+  </div>
+  <div class="rule">
+    <div class="rule-icon">📊</div>
+    <div class="rule-text"><strong>WR value over RB depth.</strong> PFR 2020–24 shows WRs average 3.5 top-12 overall finishes per year vs 4 for RBs. But WR bust rate at top-10 ADP is lower (1–2/yr) than RB (3/yr). In a 6-team league, grab elite WRs early without fear.</div>
+  </div>
+</div>
+
+</body>
+</html>

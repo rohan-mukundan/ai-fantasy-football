@@ -62,6 +62,7 @@ class DraftAgent:
         current_round: int,
         current_pick_in_round: int,
         num_teams: int,
+        injury_notes: str = "",
     ) -> dict:
         """
         Asks Claude to recommend the best available player to draft.
@@ -87,7 +88,8 @@ class DraftAgent:
         # Build the prompt with all the relevant context
         prompt = self._build_prompt(
             available_players, my_roster, current_round,
-            current_pick_in_round, num_teams
+            current_pick_in_round, num_teams,
+            injury_notes=injury_notes,
         )
 
         try:
@@ -124,6 +126,7 @@ class DraftAgent:
         current_round: int,
         current_pick_in_round: int,
         num_teams: int,
+        injury_notes: str = "",
     ) -> str:
         """
         Builds the text prompt sent to Claude.
@@ -189,10 +192,35 @@ class DraftAgent:
                 breakout_str = f"  breakout: {breakout:.0f}"
             else:
                 breakout_str = ""
+
+            # Current-season injury / suspension flag (manually maintained in data_processor.py)
+            inj_status = str(row.get("injury_status", "") or "")
+            inj_note   = str(row.get("injury_note", "") or "")
+            if inj_status in ("OUT", "IR", "SUSP", "Q"):
+                inj_str = f"  🚨 [{inj_status}] {inj_note}" if inj_note else f"  🚨 [{inj_status}]"
+            else:
+                inj_str = ""
+
+            # Transaction note: shows key offseason moves that affect this player's value.
+            # E.g. '⚡ [TRADED] Traded to new team — evaluate new scheme fit'
+            # or   '⚠ [RETIRED] Retired — targets/carries shift to teammates'
+            tx_type    = str(row.get("transaction_type", "") or "")
+            tx_note    = str(row.get("transaction_note", "") or "")
+            rank_note  = str(row.get("target_rank_note", "") or "")
+            if tx_type in ("RETIRED", "IR", "SUSPENDED"):
+                tx_str = f"  ⚠ [{tx_type}] {tx_note}" if tx_note else f"  ⚠ [{tx_type}]"
+            elif tx_type and tx_note:
+                tx_str = f"  ⚡ [{tx_type}] {tx_note}"
+            else:
+                tx_str = ""
+            # Target rank shift note (separate from transaction note — captures
+            # indirect beneficiaries who had no transaction of their own)
+            rank_str = f"  📈 {rank_note}" if rank_note and rank_note not in tx_note else ""
+
             return (
                 f"  #{int(row['season_rank']):>3}  {row['full_name']:<22} "
                 f"{str(row.get('team', 'FA')):<4}  "
-                f"{wtd_avg:.1f} wtd avg/gm{season_str}  trend: {trend}{breakout_str}"
+                f"{wtd_avg:.1f} wtd avg/gm{season_str}  trend: {trend}{breakout_str}{inj_str}{tx_str}{rank_str}"
             )
 
         position_sections = []
@@ -226,18 +254,48 @@ MY CURRENT ROSTER ({len(my_roster)} players drafted so far):
 POSITIONAL NEEDS (based on a standard PPR roster build):
 {needs_text}
 
+ROOKIE CONTEXT (factor in alongside other signals — not a hard rule, just a data point):
+- 73% of rookies are not immediate fantasy contributors. Don't reach for a rookie WR or TE before round 10 unless the breakout score and depth chart signals are exceptional.
+- Rookie QBs who earn a starting job are the exception — 0% bust rate among those who played 10+ games. Early-starting rookie QBs are real fantasy assets.
+- Elite rookie RBs (Achane, Gibbs, Robinson) are almost always age 23–24, not 21–22. Older college RBs tend to contribute immediately; young rookies typically don't.
+- Bust rate among rookies who played 10+ games: TE 68%, WR 56%, RB 47%. Factor this into any mid-round rookie consideration.
+
+AGE CONTEXT (factor this in alongside all other signals — not a hard rule, just a data point):
+- WR 31+: 39% are already in decline trend. Don't reach for a 31+ WR expecting their historical average to hold.
+- RB 28+: improving rate collapses to 2%. Draft their known ceiling, not upside.
+- RB 25–27: higher decline rate (19%) than you'd expect for "prime" — factor in when choosing between a 24-year-old and a 27-year-old RB of similar stats.
+- TE: most age-stable position. Don't penalize veteran TEs heavily for age alone.
+- QB 31+: survivor bias — QBs still starting at 31+ are genuinely elite. Age is less of a concern here.
+
 HARD RULES — these override everything else, including strategy:
 - NEVER draft a second DEF. You only start 1 defense and there is zero benefit to a backup DEF.
 - NEVER draft a second K. You only start 1 kicker and there is zero benefit to a backup K.
 - If you already have 1 DEF and 1 K, ignore both positions entirely regardless of round or availability.
 
+CURRENT INJURY & SUSPENSION NOTES (treat as ground truth — overrides historical data):
+- Ricky Pearsall: Out for the season with an injury. Do NOT draft.
+- Jordyn Tyson: On IR, expected to return mid-October. Significant draft penalty — late round flier only.
+- Josh Jacobs: On Commissioner's Exempt List, suspension likely. Could miss 4–8 weeks or the entire season. Do not draft high — late round high-risk/high-reward pick only.
+- Malik Nabers: Coming off a season-ending ACL tear in the 2025 season but will be fully healthy for 2026. Factor in the injury history but do not drop him far — treat as a 3rd–4th round pick in a 10-team league.
+- Zach Charbonnet: Tore ACL late in the 2025 season, expected to return mid-to-late 2026. Price is the starter in Seattle but will share carries — not a true workhorse. Treat as a solid RB2 with upside, not a bellcow.
+- George Kittle: Coming off an Achilles tear at the end of the 2025 season but will be healthy for 2026. Factor in his age and injury history but do not drop him drastically.
+
+VETERAN REGRESSION NOTES (treat as ground truth — these players' internal rankings are inflated by historical data that no longer reflects current value):
+- Alvin Kamara: 30 years old, averaged only 9.2 PPR pts/game in 2025. Aging RB in a crowded backfield. Do NOT draft before round 13 regardless of internal rank — treat as a late-round handcuff at best.
+{f"ADDITIONAL INJURY NOTES:{chr(10)}{injury_notes}{chr(10)}" if injury_notes.strip() else ""}
 AVAILABLE PLAYERS (up to 40 per position, ranked by weighted PPR average):
   Format: Rank  Name  Team  WeightedAvg/gm  |  YY:avg/gm  /  weeks_played  /  season_total  (per season)  trend  breakout
   Use weeks_played and season_total alongside the per-game average to assess reliability.
   A high avg/gm over very few weeks is less trustworthy than a similar avg/gm over a full season.
   Breakout score (0–100, skill positions only): flags players likely to outperform their weighted average.
-  Combines late-season surge (30 pts), year-over-year total pts improvement (30 pts), depth chart position improvement from 2024→2025 (30 pts), and youth bonus (10 pts).
+  Combines late-season surge (30 pts), year-over-year total pts improvement (30 pts), depth chart position improvement from 2024→2025 (30 pts), youth bonus (10 pts), and offseason transaction boost (0–20 pts).
   A breakout score above 40 is notable; above 60 is a strong upside signal worth considering even if the weighted average looks modest.
+  ⚡ [TX_TYPE] = offseason transaction note. Use these to factor in role changes the historical data can't capture.
+  ⚠ [RETIRED/IR/SUSPENDED] = player unavailable or departed — their historical stats are irrelevant; do NOT draft them.
+  🚨 [OUT] = season-ending injury — do NOT draft.
+  🚨 [IR] = injured reserve, out 4+ weeks — significant draft penalty, treat as late-round flier at best.
+  🚨 [SUSP] = suspension — factor in missed games when evaluating value.
+  🚨 [Q] = week-to-week injury concern, 2+ weeks — lower expected round value accordingly.
 
 {players_text}
 

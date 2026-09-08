@@ -212,8 +212,12 @@ def build_season_summary(players_df: pd.DataFrame, stats_df: pd.DataFrame, seaso
         late_tgt  = pd.Series(dtype=float, name="late_season_avg_targets")
 
     # ── Count weeks played and sum counting stats ─────────────────────────────
+    # Count weeks where the player actually took the field (gp=1), not just
+    # weeks where they scored — otherwise goose-egg games are ignored and
+    # per-game averages are inflated. Fall back to pts_ppr > 0 if gp is absent.
+    _active_filter = merged["gp"] == 1 if "gp" in merged.columns else merged["pts_ppr"] > 0
     weeks_played = (
-        merged[merged["pts_ppr"] > 0]
+        merged[_active_filter]
         .groupby("player_id").size()
         .reset_index(name="weeks_played")
     )

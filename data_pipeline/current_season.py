@@ -232,8 +232,13 @@ def update_current_season_stats(season: str, through_week: int, log=print) -> pd
     )
     merged = merged[merged["position"].isin(FANTASY_POSITIONS)]
 
+    # Count weeks where player was active (gms_active=1), not just weeks where
+    # they scored — otherwise goose-egg weeks inflate the per-game average.
+    # Count weeks where the player actually took the field (gp=1), not just
+    # weeks where they scored — otherwise goose-egg games inflate averages.
+    _active_filter = merged["gp"] == 1 if "gp" in merged.columns else merged["pts_ppr"] > 0
     weeks_played = (
-        merged[merged["pts_ppr"] > 0]
+        merged[_active_filter]
         .groupby("player_id").size()
         .reset_index(name="weeks_played_current")
     )

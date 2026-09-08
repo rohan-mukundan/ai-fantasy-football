@@ -21,10 +21,11 @@ from datetime import datetime
 from pathlib import Path
 from agents.draft_agent import DraftAgent
 from agents.strategy_agent import StrategyAgent
-from strategy import DEFAULT_STRATEGY, STRATEGIES
+from strategy import DEFAULT_STRATEGY, STRATEGIES, get_league_strategy
 from data_pipeline.sleeper_client import run_pipeline
 from data_pipeline.data_processor import build_multi_year_summary
 from data_pipeline.schedule_fetcher import fetch_bye_weeks
+from data_pipeline.transactions_scraper import run_transaction_pipeline
 from data_pipeline.current_season import (
     update_current_season_stats,
     clear_current_season_data,
@@ -46,6 +47,7 @@ from data_pipeline.defense_rankings import (
     format_opponent_offense,
     refresh_def_quality_rankings,
     load_def_quality_rankings,
+    get_remaining_schedule_strength,
     OFFENSE_EMOJI,
 )
 
@@ -309,6 +311,19 @@ def render_sidebar():
                 else:
                     for p in roster:
                         st.caption(f"{p['position']} · {p['full_name']} ({p['nfl_team']})")
+
+        # Injury / suspension notes for the AI agent
+        st.divider()
+        st.markdown("### 🚨 Injury / Suspension Notes")
+        st.caption("Type any current injury or suspension info. The AI will factor this into every pick recommendation.")
+        st.session_state.injury_notes = st.text_area(
+            label="injury_notes",
+            label_visibility="collapsed",
+            value=st.session_state.get("injury_notes", ""),
+            placeholder="e.g. Josh Jacobs injury/suspension risk, return timeline unclear. Ricky Pearsall season-ending injury. Jordyn Tyson out ~2 months (hamstring).",
+            height=120,
+            key="injury_notes_input",
+        )
 
         # Reset button
         st.divider()
@@ -896,16 +911,17 @@ def get_upgrade_recommendations(
 # ═══════════════════════════════════════════════════════════════════════════════
 
 def get_trade_recommendations(
-    my_roster:    list[dict],
-    all_picks:    list[dict],
-    all_players:  pd.DataFrame,
-    season:       str | None,
-    week:         int,
-    num_teams:    int,
-    ai_team:      int,
-    team_names:   list[str],
-    dismissed:    set | None = None,
-    max_trades:   int = 3,
+    my_roster:            list[dict],
+    all_picks:            list[dict],
+    all_players:          pd.DataFrame,
+    season:               str | None,
+    week:                 int,
+    num_teams:            int,
+    ai_team:              int,
+    team_names:           list[str],
+    dismissed:            set | None = None,
+    max_trades:           int = 3,
+    defense_rankings_df:  pd.DataFrame | None = None,
 ) -> list[dict]:   # noqa: C901
     """
     Finds trade opportunities for the AI team and returns up to max_trades
@@ -953,8 +969,32 @@ def get_trade_recommendations(
     else:
         current_by_name = pd.DataFrame()
 
+    # For trade evaluation, use a lower prior strength than lineup decisions.
+    # Lineup logic is conservative (don't bench a proven vet after 1 bad week).
+    # Trade logic should reflect what a player is actually doing THIS season —
+    # that's how real managers evaluate trade offers.
+    TRADE_PRIOR_STRENGTH = 4  # vs CURRENT_SEASON_PRIOR_STRENGTH=8 for lineups
+
+    # If a player's current-season avg is below this fraction of their prior,
+    # they're clearly not what they used to be (committee back, cut risk, etc.).
+    # Switch to aggressive discounting so their inflated prior doesn't make
+    # them look tradeable when they're not.
+    TRADE_DECLINE_RATIO    = 0.60  # below 60% of prior = significant decline
+    TRADE_DECLINE_MIN_WEEKS = 5    # need at least 5 games — protects injured players
+    # with small samples (e.g. scored 2 pts in week 1 before getting hurt;
+    # season avg = 2 would falsely trigger decline detection)
+
     def _blended(player_dict: dict) -> tuple[float, dict]:
-        """Same shrinkage formula used throughout the app."""
+        """
+        Blended value for trade evaluation.
+
+        Uses a lower prior strength than lineup decisions (4 vs 8) so
+        current-season performance matters more when assessing trade value.
+        Also applies aggressive discounting when a player is scoring
+        significantly below their historical baseline — this catches
+        declining veterans whose prior-year average would otherwise
+        make them look far more valuable than they actually are.
+        """
         name = player_dict["full_name"]
         if not players_by_name.empty and name in players_by_name.index:
             pr    = players_by_name.loc[name]
@@ -992,7 +1032,23 @@ def get_trade_recommendations(
         if wks < MIN_WEEKS_FOR_BLEND:
             return prior, info
 
-        w       = wks / (wks + CURRENT_SEASON_PRIOR_STRENGTH)
+        # Significant underperformance check: if the player is producing less
+        # than 60% of their historical baseline over 3+ games, they are clearly
+        # not what they used to be (aging back in a committee, injury-limited,
+        # changed role, etc.).  Use aggressive discounting so their inflated
+        # prior year average doesn't make them appear trade-worthy.
+        if (wks >= TRADE_DECLINE_MIN_WEEKS
+                and prior > 5.0
+                and cur < prior * TRADE_DECLINE_RATIO):
+            w       = wks / (wks + LOW_PRODUCTION_PRIOR_STRENGTH)
+            blended = round(cur * w + prior * (1 - w), 1)
+            info["blended_avg_ppr"]    = blended
+            info["confirmed_declining"] = True
+            return blended, info
+
+        # Normal case: use a lower prior strength than lineup decisions
+        # so current-season reality carries more weight in trade value.
+        w       = wks / (wks + TRADE_PRIOR_STRENGTH)
         blended = round(cur * w + prior * (1 - w), 1)
         info["blended_avg_ppr"] = blended
         return blended, info
@@ -1309,6 +1365,20 @@ def get_trade_recommendations(
     needs_list        = sorted(my_needs)
 
     for prop in selected:
+        # Attach remaining schedule strength to each player (light tiebreaker only)
+        _sched_df = defense_rankings_df if defense_rankings_df is not None else pd.DataFrame()
+        for p in prop["give"] + prop["get"]:
+            try:
+                p["schedule_strength"] = get_remaining_schedule_strength(
+                    player_team        = p.get("nfl_team", ""),
+                    position           = p.get("position", ""),
+                    current_week       = week,
+                    season             = season or "",
+                    defense_rankings_df= _sched_df if not _sched_df.empty else None,
+                )
+            except Exception:
+                p["schedule_strength"] = None
+
         prop["pitch"] = agent.generate_pitch(
             give_players    = prop["give"],
             get_players     = prop["get"],
@@ -1592,21 +1662,28 @@ def render_my_leagues():
 def render_create_league_form():
     st.markdown("### Create New League")
 
+    # num_teams must live OUTSIDE the form so changing it rerenders the team-name inputs
+    col1, col2 = st.columns(2)
+    with col1:
+        num_teams = st.selectbox(
+            "Number of teams", options=TEAM_OPTIONS,
+            index=TEAM_OPTIONS.index(st.session_state.get("create_num_teams", TEAM_OPTIONS[1])),
+            key="create_num_teams",
+        )
+
     with st.form("create_league_form"):
         league_name = st.text_input("League name", placeholder="e.g. Office League 2026")
 
-        col1, col2 = st.columns(2)
-        with col1:
-            num_teams = st.selectbox("Number of teams", options=TEAM_OPTIONS, index=1)
-        with col2:
+        col_r, col_s = st.columns(2)
+        with col_r:
             num_rounds = st.number_input("Number of rounds in the draft", min_value=5, max_value=20, value=15)
-
-        scoring = st.selectbox("Scoring format", options=SCORING_OPTIONS, index=0)
+        with col_s:
+            scoring = st.selectbox("Scoring format", options=SCORING_OPTIONS, index=0)
 
         st.markdown("**Draft order** — enter each team's name in draft order (pick 1 first), "
                      "and select which slot is your AI-managed team.")
 
-        # Default team names
+        # Team name inputs — driven by num_teams which is outside the form
         team_name_inputs = []
         for i in range(num_teams):
             default_name = f"Team {i + 1}"
@@ -1618,6 +1695,7 @@ def render_create_league_form():
             "Which draft slot is your AI-managed team?",
             options=list(range(1, num_teams + 1)),
             index=0,
+            help="Select your draft position (1 = first pick).",
         )
 
         col_save, col_cancel = st.columns(2)
@@ -2353,16 +2431,17 @@ def render_upgrade_ui(
 # ═══════════════════════════════════════════════════════════════════════════════
 
 def render_trade_ui(
-    league:       dict,
-    week:         int,
-    season:       str | None,
-    my_roster:    list[dict],
-    all_picks:    list[dict],
-    all_players:  pd.DataFrame,
-    num_teams:    int,
-    ai_team:      int,
-    team_names:   list[str],
-    roster_data:  dict,
+    league:               dict,
+    week:                 int,
+    season:               str | None,
+    my_roster:            list[dict],
+    all_picks:            list[dict],
+    all_players:          pd.DataFrame,
+    num_teams:            int,
+    ai_team:              int,
+    team_names:           list[str],
+    roster_data:          dict,
+    defense_rankings_df:  pd.DataFrame | None = None,
 ):
     """
     Renders trade proposals for the AI team.  Supports any package size
@@ -2375,16 +2454,17 @@ def render_trade_ui(
     dismissed = st.session_state[dismiss_key]
 
     proposals = get_trade_recommendations(
-        my_roster   = my_roster,
-        all_picks   = all_picks,
-        all_players = all_players,
-        season      = season,
-        week        = week,
-        num_teams   = num_teams,
-        ai_team     = ai_team,
-        team_names  = team_names,
-        dismissed   = dismissed,
-        max_trades  = 3,
+        my_roster            = my_roster,
+        all_picks            = all_picks,
+        all_players          = all_players,
+        season               = season,
+        week                 = week,
+        num_teams            = num_teams,
+        ai_team              = ai_team,
+        team_names           = team_names,
+        dismissed            = dismissed,
+        max_trades           = 3,
+        defense_rankings_df  = defense_rankings_df,
     )
 
     if not proposals:
@@ -2678,16 +2758,17 @@ def render_league_view():
 
             # ── Trade recommendations ─────────────────────────────────────────
             render_trade_ui(
-                league      = league,
-                week        = week,
-                season      = season,
-                my_roster   = my_roster,
-                all_picks   = picks,
-                all_players = all_players,
-                num_teams   = num_teams,
-                ai_team     = ai_team,
-                team_names  = team_names,
-                roster_data = roster_data,
+                league               = league,
+                week                 = week,
+                season               = season,
+                my_roster            = my_roster,
+                all_picks            = picks,
+                all_players          = all_players,
+                num_teams            = num_teams,
+                ai_team              = ai_team,
+                team_names           = team_names,
+                roster_data          = roster_data,
+                defense_rankings_df  = def_rankings_df,
             )
 
             def _attach_matchup(player: dict) -> dict:
@@ -2892,12 +2973,143 @@ def render_season_setup():
 
         st.success("✅ Data generated successfully! Go to **Draft** in the sidebar to begin.")
 
+    # ── Refresh NFL Transactions ────────────────────────────────────────────────
+    # This fetches the latest offseason transactions from ESPN and applies them
+    # to the player database. Run this after 'Generate Data' to capture trades,
+    # signings, retirements, and IR placements that affect draft values.
+    #
+    # Think of it like getting the morning news: historical stats are the resume,
+    # but the transactions tell you who got promoted, transferred, or fired.
+    if DATA_PATH.exists():
+        st.divider()
+        st.subheader("📰 NFL Transactions")
+        st.caption(
+            "Fetch the latest offseason moves from ESPN (trades, signings, releases, IR). "
+            "These update each player's breakout score and add transaction notes the AI "
+            "draft agent reads during picks. Run this after 'Generate Data'."
+        )
+
+        # Show a summary if transaction_impacts.csv already exists
+        tx_path = Path(__file__).parent / "data" / "processed" / "transaction_impacts.csv"
+        if tx_path.exists():
+            try:
+                tx_df = pd.read_csv(tx_path)
+                high   = (tx_df["fantasy_impact"] == "HIGH").sum()
+                medium = (tx_df["fantasy_impact"] == "MEDIUM").sum()
+                in_db  = tx_df["in_database"].sum() if "in_database" in tx_df.columns else len(tx_df)
+                st.info(
+                    f"Last refresh: **{len(tx_df):,} transactions** loaded "
+                    f"({in_db} matched to our database · {high} high-impact · {medium} medium-impact)"
+                )
+            except Exception:
+                pass
+
+        if st.button(
+            "🔄 Refresh Transactions",
+            help="Fetches the latest NFL transactions from ESPN and updates breakout scores",
+            use_container_width=False,
+        ):
+            tx_log_lines = []
+            tx_log_area  = st.empty()
+
+            def tx_log(msg):
+                tx_log_lines.append(msg)
+                tx_log_area.text("\n".join(tx_log_lines))
+
+            with st.spinner("Fetching NFL transactions from ESPN..."):
+                try:
+                    # Redirect stdout-style prints to our log area
+                    import io, sys
+                    old_stdout = sys.stdout
+                    sys.stdout = buffer = io.StringIO()
+
+                    stats = run_transaction_pipeline()
+
+                    sys.stdout = old_stdout
+                    captured = buffer.getvalue()
+                    if captured:
+                        tx_log(captured)
+
+                    # Show a clean summary card
+                    if "error" in stats:
+                        st.error(f"⚠️ Transaction fetch failed: {stats['error']}")
+                    else:
+                        st.success(
+                            f"✅ Transactions refreshed! "
+                            f"**{stats['total_filtered']:,}** fantasy-relevant moves detected "
+                            f"({stats['in_database']} matched to our database · "
+                            f"{stats['high_impact']} high-impact · "
+                            f"{stats['medium_impact']} medium-impact)"
+                        )
+
+                        # Show high-impact moves in an expander so the user can review them
+                        if tx_path.exists():
+                            try:
+                                tx_df = pd.read_csv(tx_path)
+                                hi_df = tx_df[tx_df["fantasy_impact"] == "HIGH"].copy()
+                                if not hi_df.empty:
+                                    display_cols = [c for c in
+                                        ["player_name", "position", "transaction_type",
+                                         "team", "impact_note", "date"]
+                                        if c in hi_df.columns]
+                                    with st.expander(
+                                        f"🔴 {len(hi_df)} High-Impact Moves", expanded=True
+                                    ):
+                                        st.dataframe(
+                                            hi_df[display_cols].rename(columns={
+                                                "player_name":      "Player",
+                                                "position":         "Pos",
+                                                "transaction_type": "Move",
+                                                "team":             "Team",
+                                                "impact_note":      "Fantasy Note",
+                                                "date":             "Date",
+                                            }),
+                                            use_container_width=True,
+                                            hide_index=True,
+                                        )
+
+                                med_df = tx_df[tx_df["fantasy_impact"] == "MEDIUM"].copy()
+                                if not med_df.empty:
+                                    display_cols = [c for c in
+                                        ["player_name", "position", "transaction_type",
+                                         "team", "impact_note", "date"]
+                                        if c in med_df.columns]
+                                    with st.expander(
+                                        f"🟡 {len(med_df)} Medium-Impact Moves", expanded=False
+                                    ):
+                                        st.dataframe(
+                                            med_df[display_cols].rename(columns={
+                                                "player_name":      "Player",
+                                                "position":         "Pos",
+                                                "transaction_type": "Move",
+                                                "team":             "Team",
+                                                "impact_note":      "Fantasy Note",
+                                                "date":             "Date",
+                                            }),
+                                            use_container_width=True,
+                                            hide_index=True,
+                                        )
+                            except Exception as e:
+                                st.warning(f"Could not display transaction table: {e}")
+
+                        # Reload cached player data so the draft agent sees updated scores
+                        load_players.clear()
+                        load_players_for_season.clear()
+
+                except Exception as e:
+                    sys.stdout = old_stdout
+                    st.error(f"⚠️ Unexpected error: {e}")
+
     # ── Player list preview ─────────────────────────────────────────────────────
     if DATA_PATH.exists():
         st.divider()
         preview_season = str(int(draft_year)) if draft_year else None
         all_players = load_players_for_season(preview_season)
-        render_available_players(all_players, selectable=False)
+        # Filter out FA/cut players for the preview (same as draft table)
+        preview_players = all_players[
+            all_players["team"].notna() & (all_players["team"] != "FA")
+        ].reset_index(drop=True)
+        render_available_players(preview_players, selectable=False)
 
     # ── Testing tools ────────────────────────────────────────────────────────────
     st.divider()
@@ -3001,16 +3213,29 @@ def render_setup():
         options=strategy_names,
         index=strategy_idx,
         help=(
-            "My Draft Rules: follows your hand-written strategy. "
-            "AI Agent Strategy: Claude analyzes the player pool and writes its own plan before the draft."
+            "League-Size Optimized (PPR): automatically applies the data-backed strategy "
+            "for your exact league size (derived from PFR 2020-2025 actual PPR finishes). "
+            "AI Agent Strategy: Claude analyzes the player pool and writes its own plan. "
+            "My Draft Rules: follows your hand-written strategy."
         )
     )
 
     # Show a preview of the selected strategy (read-only)
-    if STRATEGIES[strategy_name] is not None:
+    strategy_val = STRATEGIES[strategy_name]
+    if strategy_val == "__LEAGUE_SIZE__":
+        # Data-backed league-size strategy — show the version matching the current num_teams
+        league_strategy_text = get_league_strategy(num_teams)
+        st.success(
+            f"📊 **League-Size Optimized selected.** The strategy below is automatically "
+            f"calibrated for a **{num_teams}-team PPR league** based on positional scarcity "
+            f"data from PFR 2020–2025."
+        )
+        with st.expander("📋 View strategy for this league size", expanded=False):
+            st.text(league_strategy_text)
+    elif strategy_val is not None:
         # Human-written strategy — show the text so the user can review it
         with st.expander("📋 View strategy", expanded=False):
-            st.text(STRATEGIES[strategy_name])
+            st.text(strategy_val)
     else:
         # AI-generated — nothing to preview yet; explain what will happen
         st.info(
@@ -3029,7 +3254,11 @@ def render_setup():
             "strategy_name": strategy_name,
         }
 
-        if STRATEGIES[strategy_name] is None:
+        if strategy_val == "__LEAGUE_SIZE__":
+            # League-Size Optimized — resolve the strategy text for this team count now
+            draft_config["strategy"] = get_league_strategy(num_teams)
+            _start_draft(draft_config)
+        elif strategy_val is None:
             # AI Agent Strategy — generate it now, then pause so the user can read it
             with st.spinner("🧠 Claude is analyzing the player pool and writing its strategy..."):
                 all_players = load_players()
@@ -3183,7 +3412,8 @@ def render_draft(all_players: pd.DataFrame):
 
     # ── Pick area ─────────────────────────────────────────────────────────────
     if is_ai_turn:
-        render_ai_turn(available, round_num, slot, num_teams)
+        render_ai_turn(available, round_num, slot, num_teams,
+                       injury_notes=st.session_state.get("injury_notes", ""))
     else:
         render_human_turn(picking_team)
 
@@ -3198,7 +3428,8 @@ def render_ai_turn(
     available: pd.DataFrame,
     round_num: int,
     slot: int,
-    num_teams: int
+    num_teams: int,
+    injury_notes: str = "",
 ):
     """Renders the UI when it's the AI's turn to pick."""
     st.success(f"🤖 **It's your AI team's turn to pick!**")
@@ -3233,6 +3464,7 @@ def render_ai_turn(
                     current_round=round_num,
                     current_pick_in_round=slot,
                     num_teams=num_teams,
+                    injury_notes=injury_notes,
                 )
 
             if rec.get("error"):
@@ -3273,7 +3505,7 @@ def render_available_players(available: pd.DataFrame, selectable: bool = False):
     in session state so the confirm button above can use it.
     """
     st.markdown("### Available Players")
-    st.caption("Breakout column: blank = already elite (18+ avg pts/game in 2024), not applicable.")
+    st.caption("Breakout column: blank = already elite (18+ avg pts/game in 2025), not applicable.")
     if selectable:
         st.caption("👆 Click any row to select that player as the pick.")
 
@@ -3296,27 +3528,35 @@ def render_available_players(available: pd.DataFrame, selectable: bool = False):
     filtered = available if st.session_state.pos_filter == "All" \
                else available[available["position"] == st.session_state.pos_filter]
 
+    # Sort by consensus ADP (FantasyPros 2026) when available; fall back to VOR rank
+    if "adp_2026" in filtered.columns:
+        filtered = filtered.sort_values("adp_2026", ascending=True, na_position="last")
+    else:
+        filtered = filtered.sort_values("season_rank", ascending=True)
+
     # Columns to display (keep full_name for selection lookup, hide it visually via rename)
     display_cols = {
-        "season_rank":        "Rank",
+        "adp_2026":           "ADP",
         "full_name":          "Player",
         "position":           "Pos",
         "team":               "NFL Team",
         "weighted_avg_ppr":   "Wtd Avg PPR",
+        "avg_pts_ppr_2025":   "2025 Avg/Gm",
+        "total_pts_ppr_2025": "2025 Total",
+        "weeks_played_2025":  "2025 Wks",
         "avg_pts_ppr_2024":   "2024 Avg/Gm",
         "total_pts_ppr_2024": "2024 Total",
         "weeks_played_2024":  "2024 Wks",
         "avg_pts_ppr_2023":   "2023 Avg/Gm",
         "total_pts_ppr_2023": "2023 Total",
         "weeks_played_2023":  "2023 Wks",
-        "avg_pts_ppr_2022":   "2022 Avg/Gm",
-        "total_pts_ppr_2022": "2022 Total",
-        "weeks_played_2022":  "2022 Wks",
         "trend":              "Trend",
         "years_of_data":      "Yrs Data",
         "breakout_score":     "Breakout",
+        "durability_score":   "Durability",
         "depth_improvement":  "Depth ↑",
-        "surge_score_2024":   "Surge",
+        "surge_score_2025":   "Surge",
+        "injury_status":      "Status",
     }
     available_display_cols = {k: v for k, v in display_cols.items() if k in filtered.columns}
     display_df = filtered[list(available_display_cols.keys())].rename(

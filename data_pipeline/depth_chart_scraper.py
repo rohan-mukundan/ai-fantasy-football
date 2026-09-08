@@ -26,6 +26,7 @@ from pathlib import Path
 ARCHIVES = {
     2024: (287, "08/01/2024"),
     2025: (300, "08/01/2025"),
+    2026: (313, "08/01/2026"),
 }
 
 BASE_URL = "https://www.ourlads.com/nfldepthcharts/archive"

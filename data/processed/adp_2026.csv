@@ -1,0 +1,712 @@
+adp_rank,name,adp_avg
+1,Jahmyr Gibbs,1.0
+2,Bijan Robinson,2.0
+3,Ja'Marr Chase,3.0
+4,Puka Nacua,4.0
+5,Christian McCaffrey,5.8
+6,Jonathan Taylor,6.0
+7,Jaxon Smith-Njigba,6.2
+8,Amon-Ra St. Brown,8.2
+9,James Cook III,8.8
+10,CeeDee Lamb,11.2
+11,De'Von Achane,11.8
+12,Justin Jefferson,12.0
+13,Chase Brown,12.6
+14,Saquon Barkley,13.4
+15,Omarion Hampton,15.0
+16,Derrick Henry,16.6
+17,Kenneth Walker III,18.0
+18,A.J. Brown,18.0
+19,Ashton Jeanty,18.6
+20,Drake London,20.2
+21,Brock Bowers,22.8
+22,Josh Allen,23.2
+23,Nico Collins,23.6
+24,George Pickens,24.2
+25,Trey McBride,25.2
+26,Chris Olave,26.0
+27,Javonte Williams,27.6
+28,Kyren Williams,28.0
+29,Malik Nabers,28.2
+30,Jeremiyah Love,28.8
+31,Rashee Rice,29.0
+32,DeVonta Smith,32.4
+33,Breece Hall,33.6
+34,Travis Etienne Jr.,35.6
+35,Zay Flowers,37.0
+36,Cam Skattebo,39.2
+37,Tetairoa McMillan,40.0
+38,Lamar Jackson,40.4
+39,Colston Loveland,40.4
+40,Garrett Wilson,40.6
+41,Tee Higgins,41.8
+42,Emeka Egbuka,42.4
+43,Ladd McConkey,42.8
+44,D'Andre Swift,43.4
+45,Quinshon Judkins,45.0
+46,Jaylen Waddle,46.4
+47,Bucky Irving,46.6
+48,DJ Moore,48.2
+49,David Montgomery,49.4
+50,Davante Adams,50.0
+51,Tyler Warren,51.4
+52,Drake Maye,52.8
+53,Luther Burden III,53.0
+54,Joe Burrow,53.2
+55,Bhayshul Tuten,55.6
+56,Jadarian Price,55.8
+57,Jameson Williams,55.8
+58,Terry McLaurin,55.8
+59,Rome Odunze,61.2
+60,Jalen Hurts,63.6
+61,TreVeyon Henderson,63.8
+62,Parker Washington,64.6
+63,Jayden Daniels,64.6
+64,Rhamondre Stevenson,64.8
+65,Christian Watson,66.4
+66,Harold Fannin Jr.,68.8
+67,Mike Evans,69.2
+68,Jaylen Warren,71.0
+69,Tucker Kraft,72.2
+70,Marvin Harrison Jr.,73.2
+71,Sam LaPorta,74.2
+72,Kyle Pitts Sr.,74.2
+73,Dak Prescott,75.0
+74,Tony Pollard,75.8
+75,Caleb Williams,76.0
+76,Carnell Tate,76.6
+77,Courtland Sutton,77.8
+78,Rico Dowdle,79.2
+79,DK Metcalf,81.4
+80,George Kittle,81.6
+81,Jonathon Brooks,83.2
+82,Josh Jacobs,84.6
+83,Justin Herbert,84.6
+84,Michael Wilson,85.4
+85,Brian Thomas Jr.,87.0
+86,MarShawn Lloyd,89.4
+87,RJ Harvey,89.6
+88,J.K. Dobbins,91.2
+89,Trevor Lawrence,91.8
+90,Chris Godwin Jr.,92.0
+91,Chuba Hubbard,93.6
+92,Alec Pierce,96.0
+93,Kenny Gainwell,98.0
+94,Travis Kelce,98.4
+95,Brandon Aubrey,98.8
+96,Michael Pittman Jr.,99.4
+97,Blake Corum,99.8
+98,Matthew Stafford,100.6
+99,Jaxson Dart,101.2
+100,Stefon Diggs,101.2
+101,Jordan Mason,102.2
+102,Houston Texans DST,103.2
+103,Wan'Dale Robinson,103.4
+104,Quentin Johnston,103.4
+105,Isaiah Likely,104.6
+106,Los Angeles Rams DST,105.0
+107,Kyle Monangai,108.8
+108,Jordan Addison,108.8
+109,Jacory Croskey-Merritt,109.2
+110,Patrick Mahomes II,109.4
+111,Dallas Goedert,109.8
+112,De'Zhaun Stribling,110.8
+113,Bo Nix,113.2
+114,Denver Broncos DST,114.0
+115,Brock Purdy,114.0
+116,Makai Lemon,114.2
+117,Rachaad White,115.6
+118,Josh Downs,116.2
+119,Aaron Jones Sr.,116.4
+120,Jayden Reed,116.6
+121,Dalton Kincaid,117.0
+122,Jake Ferguson,121.0
+123,Jakobi Meyers,121.8
+124,Seattle Seahawks DST,122.0
+125,KC Concepcion,122.2
+126,Jared Goff,123.2
+127,Matthew Golden,123.4
+128,Mike Washington Jr.,126.4
+129,Mark Andrews,127.8
+130,Romeo Doubs,131.8
+131,Xavier Worthy,133.0
+132,Ka'imi Fairbairn,134.6
+133,Woody Marks,134.8
+134,Cameron Dicker,135.8
+135,Deebo Samuel Sr.,135.8
+136,Jason Myers,136.2
+137,Chris Rodriguez Jr.,137.4
+138,Kyler Murray,138.6
+139,Philadelphia Eagles DST,139.6
+140,Baker Mayfield,141.4
+141,Tyler Allgeier,142.2
+142,Jalen Coker,142.2
+143,Tyjae Spears,144.8
+144,Khalil Shakir,146.8
+145,Zach Charbonnet,147.2
+146,Jordyn Tyson,147.4
+147,Rashid Shaheed,147.8
+148,Juwan Johnson,149.0
+149,Jordan Love,150.0
+150,Cam Little,150.2
+151,Pittsburgh Steelers DST,151.4
+152,Jonah Coleman,153.2
+153,New England Patriots DST,156.0
+154,Baltimore Ravens DST,156.8
+155,Tyler Shough,158.0
+156,Hunter Henry,160.6
+157,Brenton Strange,164.6
+158,Jake Bates,165.4
+159,Minnesota Vikings DST,165.6
+160,Keaton Mitchell,166.2
+161,Alvin Kamara,166.6
+162,Harrison Mevis,167.4
+163,Jacksonville Jaguars DST,169.2
+164,Brian Robinson Jr.,170.4
+165,Denzel Boston,172.2
+166,Tank Bigsby,172.8
+167,Los Angeles Chargers DST,173.2
+168,Malik Willis,173.4
+169,T.J. Hockenson,175.2
+170,Tre Tucker,176.0
+171,Dalton Schultz,176.0
+172,Ja'Kobi Lane,177.6
+173,Kenyon Sadiq,179.8
+174,Dylan Sampson,180.4
+175,Harrison Butker,182.2
+176,Terrance Ferguson,182.6
+177,Isiah Pacheco,182.6
+178,Keenan Allen,183.8
+179,Daniel Jones,184.2
+180,Eddy Pineiro,185.2
+181,Tyler Loop,187.0
+182,Detroit Lions DST,187.8
+183,C.J. Stroud,187.8
+184,Jerry Jeudy,188.2
+185,Sam Darnold,193.4
+186,Emmett Johnson,194.6
+187,Kaelon Black,196.8
+188,Will Reichard,203.2
+189,Evan McPherson,203.2
+190,Dallas Cowboys DST,206.6
+191,Green Bay Packers DST,209.4
+192,Buffalo Bills DST,211.2
+193,Kansas City Chiefs DST,214.4
+194,Cairo Santos,218.6
+195,Tyrone Tracy Jr.,155.5
+196,Kayshon Boutte,174.5
+197,Braelon Allen,180.3
+198,Cleveland Browns DST,248.4
+199,Chig Okonkwo,185.8
+200,Jalen McMillan,187.5
+201,Jalen Nailor,189.8
+202,Cyrus Allen,192.8
+203,Jauan Jennings,195.5
+204,Wil Lutz,259.2
+205,Malik Washington,202.0
+206,Chris Boswell,203.5
+207,AJ Barner,203.8
+208,Caleb Douglas,204.0
+209,Cooper Kupp,204.8
+210,Bryce Young,207.5
+211,Trey Smack,208.3
+212,Cam Ward,216.5
+213,San Francisco 49ers DST,222.8
+214,Andy Borregales,224.0
+215,Greg Dulcich,225.5
+216,Chicago Bears DST,225.8
+217,Chase McLaughlin,225.8
+218,David Njoku,229.3
+219,Cade Otton,235.8
+220,Jacoby Brissett,244.8
+221,Calvin Ridley,245.8
+222,Pat Freiermuth,250.3
+223,New York Giants DST,254.5
+224,Oronde Gadsden II,174.7
+225,Tank Dell,188.7
+226,Omar Cooper Jr.,189.3
+227,Ray Davis,201.3
+228,Tyler Bass,278.5
+229,Fernando Mendoza,207.7
+230,Malachi Fields,215.0
+231,Najee Harris,217.7
+232,Kaleb Johnson,219.0
+233,Adonai Mitchell,219.7
+234,Aaron Rodgers,221.0
+235,Ryan Flournoy,221.3
+236,Atlanta Falcons DST,223.0
+237,Isaac TeSlaa,224.0
+238,Tre' Harris,225.0
+239,Tennessee Titans DST,298.8
+240,Jake Elliott,232.3
+241,Zachariah Branch,233.0
+242,Nicholas Singleton,233.3
+243,Kimani Vidal,235.3
+244,Chris Bell,241.3
+245,Pat Bryant,244.3
+246,Tyreek Hill,245.3
+247,Kaytron Allen,249.0
+248,Sean Tucker,254.7
+249,Rashod Bateman,258.0
+250,Ted Hurst III,262.0
+251,J.J. McCarthy,262.3
+252,New Orleans Saints DST,264.3
+253,Devaughn Vele,265.0
+254,Shedeur Sanders,266.0
+255,Jaylen Wright,270.0
+256,Carolina Panthers DST,270.7
+257,Cincinnati Bengals DST,276.7
+258,Dontayvion Wicks,172.0
+259,Travis Hunter,173.5
+260,Demond Claiborne,284.0
+261,Christian Kirk,289.0
+262,Chimere Dike,289.3
+263,Justice Hill,185.0
+264,Kyle Williams,301.3
+265,George Holani,205.0
+266,Blake Grupe,304.0
+267,Malik Davis,214.5
+268,Las Vegas Raiders DST,310.7
+269,Eli Stowers,312.0
+270,Joe Mixon,313.3
+271,Jordan James,223.5
+272,Brandon Aiyuk,316.7
+273,Jaydon Blue,230.5
+274,Samaje Perine,234.5
+275,Spencer Shrader,237.0
+276,James Conner,238.5
+277,Antonio Williams,240.0
+278,Indianapolis Colts DST,245.5
+279,Jaylin Noel,247.0
+280,Odell Beckham Jr.,250.5
+281,Washington Commanders DST,250.5
+282,Chris Brooks,251.0
+283,Ty Simpson,334.0
+284,Kirk Cousins,251.5
+285,Michael Penix Jr.,257.5
+286,Gunnar Helm,259.0
+287,Germie Bernard,259.0
+288,Mason Taylor,259.5
+289,Seth McGowan,260.0
+290,Jacob Saylors,261.5
+291,Tampa Bay Buccaneers DST,262.0
+292,Tua Tagovailoa,265.0
+293,Zavion Thomas,268.5
+294,Dominic Zvada,269.0
+295,Cole Kmet,271.0
+296,Marvin Mims Jr.,271.5
+297,Matt Gay,347.7
+298,Darnell Washington,274.5
+299,Troy Franklin,278.0
+300,Tory Horton,278.5
+301,Keon Coleman,280.5
+302,Riley Patterson,353.7
+303,Jack Bech,285.5
+304,Camden Brown,288.0
+305,Darnell Mooney,289.0
+306,Adrian Martinez,289.5
+307,Miami Dolphins DST,361.3
+308,Charlie Smyth,362.7
+309,Jake Tonges,297.0
+310,Michael Trigg,298.5
+311,Drew Stevens,298.5
+312,Jameis Winston,301.0
+313,Dawson Knox,302.5
+314,Geno Smith,302.5
+315,Arizona Cardinals DST,369.7
+316,Hollywood Brown,305.5
+317,Devontez Walker,305.5
+318,Colby Parkinson,306.0
+319,Chad Ryland,308.5
+320,Emanuel Wilson,309.5
+321,Ben Sauls,310.0
+322,Jason Sanders,311.0
+323,Elic Ayomanor,311.5
+324,Joey Slye,312.5
+325,Kaden Wetjen,314.0
+326,Devin Singletary,314.5
+327,Kendre Miller,315.0
+328,Tommy DeVito,317.0
+329,Roschon Johnson,318.0
+330,J.J. Taylor,318.5
+331,Skyler Bell,320.0
+332,Efton Chism III,320.0
+333,Jalon Daniels,320.5
+334,Myles Price,322.0
+335,Ashton Dulin,323.5
+336,Luke McCaffrey,329.0
+337,Theo Johnson,329.5
+338,Kyle Allen,331.0
+339,Jonathan Mingo,331.5
+340,Jake Moody,333.0
+341,Andre Szmyt,333.5
+342,Trey Benson,389.0
+343,KaVontae Turpin,334.0
+344,Montorie Foster Jr.,335.5
+345,Ryan Fitzgerald,336.5
+346,Dohnte Meyers,340.5
+347,Brashard Smith,341.0
+348,Devin Neal,343.0
+349,Drew Lock,344.0
+350,Colbie Young,344.5
+351,Tyson Bagent,346.0
+352,Drew Allar,346.5
+353,Joshua Palmer,346.5
+354,Jimmy Garoppolo,347.5
+355,Tyrod Taylor,348.5
+356,Elijah Sarratt,399.0
+357,Joe Flacco,349.5
+358,Barion Brown,351.0
+359,Audric Estime,354.0
+360,Tyler Higbee,355.5
+361,Tyler Huntley,355.5
+362,Justin Tucker,212.0
+363,Justin Fields,356.0
+364,Lil'Jordan Humphrey,360.5
+365,Younghoe Koo,222.0
+366,Kalif Raymond,366.5
+367,Philip Rivers,234.0
+368,Evan Engram,234.0
+369,New York Jets DST,368.0
+370,Elijah Arroyo,369.5
+371,Hunter Luepke,370.0
+372,Zach Wilson,370.5
+373,Ja'Tavion Sanders,371.0
+374,AJ Dillon,371.0
+375,Noah Gray,371.5
+376,Tay Martin,371.5
+377,Trevor Etienne,372.5
+378,Nick Folk,372.5
+379,Brock Wright,247.0
+380,Will Howard,374.0
+381,DeWayne McBride,249.0
+382,Luke Schoonmaker,251.0
+383,Jermar Jefferson,252.0
+384,Trey Lance,376.0
+385,Tutu Atwell,376.5
+386,LaJohntay Wester,377.0
+387,Emari Demercado,255.0
+388,Kareem Hunt,377.5
+389,Marlin Klein,377.5
+390,Mike Gesicki,257.0
+391,Tejhaun Palmer,259.0
+392,Chris Tyree,260.0
+393,Gardner Minshew II,380.0
+394,Mac Jones,380.5
+395,Sam Roush,381.0
+396,CJ Daniels,382.5
+397,Nate Noel,266.0
+398,Josh Oliver,383.0
+399,Jazz Ferguson,268.0
+400,Ulysses Bentley IV,268.0
+401,AJ Henning,269.0
+402,Jordan Whittington,384.5
+403,Eli Raridon,385.0
+404,Elijah Higgins,387.0
+405,Raylen Sharpe,274.0
+406,Jamal Agnew,275.0
+407,Braxton Berrios,275.0
+408,Jacardia Wright,387.5
+409,David White Jr.,276.0
+410,Deshaun Watson,277.0
+411,Brandon McManus,278.0
+412,Matt Prater,279.0
+413,Peter LeBlanc,279.0
+414,Drake Dabney,280.0
+415,Emmanuel Henderson Jr.,281.0
+416,Marcus Major Jr.,284.0
+417,Anthony Miller,285.0
+418,Jackson Meeks,392.5
+419,Kyle Juszczyk,286.0
+420,Mason Rudolph,393.0
+421,Skyy Moore,393.0
+422,Jonnu Smith,287.0
+423,KeAndre Lambert-Smith,290.0
+424,Quali Conley,290.0
+425,Demarcus Robinson,395.0
+426,Quinn Ewers,395.0
+427,Albert Wilson,291.0
+428,Malachi Corley,395.5
+429,Chris Warren III,292.0
+430,Jahdae Walker,292.0
+431,Ollie Gordon II,293.0
+432,Jarrett Stidham,396.5
+433,Elijah Moore,397.0
+434,Darren Waller,296.0
+435,Andy Dalton,398.5
+436,Dalvin Cook,298.0
+437,Andrei Iosivas,298.0
+438,Ezekiel Elliott,300.0
+439,Tyquan Thornton,301.0
+440,Caden Davis,301.0
+441,Lewis Bond,302.0
+442,Mo Alie-Cox,401.0
+443,Anthony Smith,303.0
+444,Konata Mumpfield,402.0
+445,Bam Knight,305.0
+446,Tommy Tremble,402.5
+447,Jarquez Hunter,306.0
+448,LeQuint Allen Jr.,306.0
+449,Carson Beck,307.0
+450,Sam Howell,307.0
+451,RJ Maryland,309.0
+452,Tony Jones,310.0
+453,Adam Trautman,310.0
+454,Nate Adkins,405.5
+455,Roman Wilson,312.0
+456,Anthony Richardson Sr.,406.0
+457,Frank Gore Jr.,406.0
+458,Jackson Hawes,314.0
+459,DJ Giddens,316.0
+460,Brevyn Spann-Ford,318.0
+461,Nate Boerkircher,409.0
+462,Carson Wentz,409.5
+464,Kenny Pickett,320.0
+465,Joshua Dobbs,321.0
+466,Xavier Legette,322.0
+467,Sione Vaki,323.0
+468,Michael Mayer,325.0
+469,Josh Cameron,413.0
+470,Daniel Carlson,327.0
+471,D.J. Montgomery,327.0
+472,Jelani Woods,327.0
+473,Durham Smythe,414.0
+474,Stetson Bennett IV,329.0
+475,Jalen Sample,329.0
+476,Jake Bobo,330.0
+477,Jalen Jackson,330.0
+478,Eli Heidenreich,330.0
+479,D'Vonte Price,331.0
+480,John Jiles,331.0
+481,C.J. Ham,332.0
+482,Coleman Owen,332.0
+483,Mitchell Trubisky,416.0
+484,Equanimeous St. Brown,333.0
+485,JuJu Smith-Schuster,334.0
+486,Noah Fant,417.0
+487,Amari Cooper,335.0
+488,Devin Duvernay,335.0
+489,Anthony Grant,335.0
+490,DeAndre Hopkins,336.0
+491,Malcolm Brown,336.0
+492,Dustin Hopkins,338.0
+493,Jaden Shirden,338.0
+494,Dimitri Stanley,339.0
+495,Max Klare,419.5
+496,Dyami Brown,419.5
+497,Israel Abanikanda,340.0
+498,Tanner Gentry,341.0
+499,Max Brosmer,341.0
+500,Ramel Keyton,342.0
+501,Kedon Slovis,343.0
+502,Montrell Washington,343.0
+503,Tulu Griffin,343.0
+504,Tez Johnson,421.5
+505,D.J. Foster,344.0
+506,Brennan Presley,344.0
+507,Jahan Dotson,345.0
+508,Amar Johnson,345.0
+509,Phil Mafah,346.0
+510,B.T. Potter,347.0
+511,Jarveon Howard,347.0
+512,Michael Walker,348.0
+513,Chris Hilton Jr.,348.0
+514,Drew Sample,350.0
+515,Lincoln Sefcik,350.0
+516,Kenjon Barner,351.0
+517,Ademola Faleye,353.0
+518,Jalen Royals,427.0
+519,Mitchell Evans,355.0
+520,Darius Slayton,356.0
+521,Dylan Drummond,356.0
+522,Austin Hooper,428.0
+523,Bryce Lance,428.0
+524,Ty Johnson,357.0
+525,Xavier Smith,428.5
+526,Cade Stover,359.0
+527,Trey Knox,360.0
+528,Josh Adams,361.0
+529,Diego Pavia,361.0
+530,Omar Bayless,362.0
+531,Ameer Abdullah,363.0
+532,Marquez Stevenson,363.0
+533,Max Bredeson,431.5
+534,Jimmy Horn Jr.,364.0
+535,Zane Gonzalez,433.0
+536,Bo Melton,369.0
+537,Dallin Holker,370.0
+538,Blake Whiteheart,370.0
+539,Michael Burton,373.0
+540,Sage Surratt,373.0
+541,Justin Sumpter,374.0
+542,Josh Whyle,374.0
+543,Tyler Conklin,378.0
+544,Matt Seybert,378.0
+545,Chamon Metayer,379.0
+546,Josh Williams,439.5
+547,Jeremy Cox,380.0
+548,Tyree Mayfield,381.0
+549,Drew Ogletree,381.0
+550,Luke Musgrave,440.5
+551,Raheim Sanders,440.5
+552,Lawrence Cager,382.0
+553,Erick All Jr.,382.0
+554,Jalen Hurd,384.0
+555,Darius Cooper,384.0
+556,Johnny Mundt,385.0
+557,Reggie White Jr.,385.0
+558,Charlie Taumoepeau,386.0
+559,Reggie Gilliam,386.0
+560,Patrick Ricard,387.0
+561,Dillon Gabriel,387.0
+562,Terrell Jennings,387.0
+563,MyCole Pruitt,388.0
+564,Chris Manhertz,388.0
+565,Cade Klubnik,444.0
+566,Ben Skowronek,389.0
+567,Justin Joly,444.5
+568,Matt Colburn II,390.0
+569,DeMario Douglas,390.0
+570,British Brooks,390.0
+571,Deion Burks,391.0
+572,Ke'Shawn Williams,391.0
+573,Thayer Thomas,393.0
+574,Nikko Remigio,393.0
+575,Davis Mills,446.5
+576,Geoff Swaim,394.0
+577,Trenton Cannon,395.0
+578,Jalen Brooks,395.0
+579,Ray-Ray McCloud III,396.0
+580,Daniel Bellinger,450.0
+581,Devin Gray,402.0
+582,Julius Chestnut,402.0
+583,Jeremiah Hall,403.0
+584,Ronnie Rivers,403.0
+585,Tahj Brooks,403.0
+586,Charlie Kolar,404.0
+587,Brady Russell,405.0
+588,Jake Browning,406.0
+589,Carlos Washington Jr.,406.0
+590,Colson Yankoff,406.0
+591,Jalen Milroe,407.0
+592,Marcus Burke,407.0
+593,Jordan Watkins,408.0
+594,Tanner Koziol,454.0
+595,Salvon Ahmed,409.0
+596,Derrick Johnson,410.0
+597,Corey Kiner,410.0
+598,Will Shipley,411.0
+599,Beaux Collins,412.0
+600,Dean Connors,412.0
+601,Colton Dowell,413.0
+602,Brady Cook,413.0
+603,Jimmy Holiday,414.0
+604,Will Kacmarek,457.0
+605,Michael Carter,415.0
+606,Jacob Harris,416.0
+607,Jacoby Jones,416.0
+608,Kendrick Law,417.0
+609,Malik Benson,418.0
+610,Haynes King,419.0
+611,Keytaon Thompson,420.0
+612,J. Michael Sturdivant,420.0
+613,Justin Watson,421.0
+614,Taysom Hill,422.0
+615,Marcus Mariota,423.0
+616,Trayveon Williams,423.0
+617,Austin Seibert,424.0
+618,Dalevon Campbell,424.0
+619,Greg Joseph,425.0
+620,Zay Jones,426.0
+621,Jalen Tolbert,426.0
+622,Michael Badgley,427.0
+623,Austin Ekeler,428.0
+624,Jamaal Williams,430.0
+625,Isaac Guerendo,430.0
+626,Derek Carr,431.0
+627,Jam Miller,431.0
+628,Zach Ertz,432.0
+629,Antonio Gibson,434.0
+630,Antonio Nunn,434.0
+631,Robert Tonyan,435.0
+632,Jaleel Scott,435.0
+633,Kadarius Toney,435.0
+634,Steven Mitchell Jr.,436.0
+635,Zamir White,436.0
+636,Will Levis,437.0
+637,Tanner Brown,438.0
+638,Mohamed Ibrahim,439.0
+639,Ryan Jones,439.0
+640,Riley Leonard,469.5
+641,Connor Heyward,469.5
+642,Chris Conley,440.0
+643,Sterling Shepard,440.0
+644,Jaleel McLaughlin,470.5
+645,Kenny McIntosh,441.0
+646,Joshua Karty,441.0
+647,Marcus Baugh,442.0
+648,Brenden Rice,442.0
+649,Jack Strand,442.0
+650,Javorius Allen,443.0
+651,Joe Milton III,443.0
+652,Dont'e Thornton Jr.,443.0
+653,Eric Rogers,444.0
+654,Parker Romo,444.0
+655,Rodney Adams,445.0
+656,Tre Mosley,446.0
+657,Jude McAtamney,446.0
+658,Zavier Scott,448.0
+659,Oscar Delp,474.0
+660,Zach Horton,449.0
+661,Treylon Burks,474.5
+662,Quentin Skinner,450.0
+663,Cade York,452.0
+664,Tanner McKee,452.0
+665,Jaylin Lane,453.0
+666,Kendrick Bourne,457.0
+667,Isaiah Bond,479.5
+668,John Bates,458.0
+669,Isaiah Williams,459.0
+670,Jerome Ford,460.0
+671,Brenen Thompson,460.0
+672,Ben Sinnott,462.0
+673,Jeremy Ruckert,463.0
+674,Isaiah Davis,463.0
+675,Davis Allen,465.0
+676,Xavier Hutchinson,465.0
+677,Foster Moreau,466.0
+678,Olamide Zaccheaus,468.0
+679,Payne Durham,468.0
+680,Laquon Treadwell,470.0
+681,Alec Ingold,471.0
+682,Seydou Traore,472.0
+683,Derius Davis,474.0
+684,Adam Prentice,475.0
+685,Jacob Cowing,476.0
+686,Ko Kieft,480.0
+687,Savion Williams,481.0
+688,Tai Felton,481.0
+689,Spencer Rattler,482.0
+690,Luke Farrell,483.0
+691,Jawhar Jordan,483.0
+692,John Metchie III,484.0
+693,Josh Cuevas,484.0
+694,Eric Saubert,486.0
+695,Andrew Beck,487.0
+696,Hunter Long,489.0
+697,Ian Thomas,490.0
+698,Dareke Young,491.0
+699,Charlie Woerner,492.0
+700,Adam Randall,492.0
+701,Mack Hollins,493.0
+702,Nick Westbrook-Ikhine,494.0
+703,Carsen Ryan,494.0
+704,Reggie Virgil,495.0
+705,Kyle McCord,496.0
+706,Brycen Tremayne,497.0
+707,Kevin Coleman Jr.,497.0
+708,Kameron Johnson,499.0
+709,Greg Dortch,500.0
+710,Arian Smith,500.0
+711,Chris Brazzell II,504.0
+712,Brendan Sorsby,507.0

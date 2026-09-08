@@ -1127,6 +1127,91 @@ def format_opponent_offense(opp: dict | None) -> str:
     return f"{emoji} vs {opp['opponent']} ({opp['offense_label']} offense, #{opp['recent_rank']})"
 
 
+# ── Remaining schedule strength ───────────────────────────────────────────────
+
+def get_remaining_schedule_strength(
+    player_team: str,
+    position: str,
+    current_week: int,
+    season: str,
+    defense_rankings_df: pd.DataFrame | None = None,
+) -> dict | None:
+    """
+    Returns how easy or tough a player's remaining schedule is through
+    the end of the NFL regular season (week 18), based on how many
+    fantasy points each upcoming opponent's defense has allowed to that
+    position this season.
+
+    Parameters
+    ----------
+    player_team         : NFL team abbreviation (e.g. "DEN")
+    position            : Player position ("QB", "RB", "WR", "TE")
+    current_week        : The current NFL week (remaining = current_week+1 onward)
+    season              : Season year string
+    defense_rankings_df : Pre-loaded defense rankings df (optional)
+
+    Returns
+    -------
+    dict or None:
+      {
+        "avg_rank":        22.5,    # avg opp def rank vs this position (1=toughest, 32=easiest)
+        "schedule_label":  "easy",  # "easy" / "average" / "tough"
+        "weeks_remaining": 11,      # total weeks left in the season
+        "weeks_with_data": 8,       # weeks where we had both matchup + ranking data
+      }
+    Returns None if position is not rankable or no data is available.
+    """
+    if position not in RANKED_POSITIONS or not player_team or player_team == "FA":
+        return None
+
+    if defense_rankings_df is None:
+        defense_rankings_df = load_defense_rankings(season)
+    if defense_rankings_df is None or defense_rankings_df.empty:
+        return None
+
+    NFL_FINAL_WEEK = 18
+    remaining_weeks = range(current_week + 1, NFL_FINAL_WEEK + 1)
+    if not remaining_weeks:
+        return None
+
+    ranks = []
+    for week in remaining_weeks:
+        matchups = _fetch_week_matchups(season, week)
+        opponent = matchups.get(player_team)
+        if not opponent:
+            continue  # bye or missing matchup data
+
+        row = defense_rankings_df[
+            (defense_rankings_df["team"] == opponent) &
+            (defense_rankings_df["position"] == position)
+        ]
+        if row.empty:
+            continue
+
+        ranks.append(int(row.iloc[0]["rank"]))
+
+    if not ranks:
+        return None
+
+    avg_rank = round(sum(ranks) / len(ranks), 1)
+    n = 32  # total teams ranked
+
+    # Higher avg_rank = easier schedule (opponents allow more pts to this position)
+    if avg_rank >= n * 0.67:      # top third by easiness (rank 22-32)
+        label = "easy"
+    elif avg_rank >= n * 0.33:    # middle third (rank 11-21)
+        label = "average"
+    else:                          # bottom third (rank 1-10) — tough defenses
+        label = "tough"
+
+    return {
+        "avg_rank":        avg_rank,
+        "schedule_label":  label,
+        "weeks_remaining": len(remaining_weeks),
+        "weeks_with_data": len(ranks),
+    }
+
+
 # ── Standalone runner ─────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
